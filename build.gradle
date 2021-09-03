@@ -1,0 +1,99 @@
+plugins {
+    id 'java'
+    id("com.github.bjornvester.xjc") version "1.6.0"
+}
+
+group = 'org.iata.cargoxml'
+version = '8.0'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+}
+
+dependencies {
+    /*
+     * The following bindings are not required to BUILD or JAR this project
+     * but the generated classes in the jar depend upon them.
+     * (although included in Java 8)
+     * In order to publish properly, the dependencies are declared.
+     */
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
+}
+
+jar {
+    exclude("**/schema/CXML-*/**")
+    exclude("**/schema/X*-*.00/**")
+}
+
+ext {
+    // for Cargo-XML 8th Edition, the path is
+    // "%LOCALAPPDATA%\IATA\Reader\1.0.0.0\Library\CXML 8th\Downloads\Schemas"
+    // for Cargo-XML 4th Edition, the path is
+    // "%APPDATA%\IATA\IATA Cargo-XML Message Manual and Toolkit 4th Edition\Downloads\Schemas"
+
+    // default is set to Cargo-XML 8th Edition
+    schemadir = project.findProperty("schemadir") ?: (System.getenv("LOCALAPPDATA") + "\\IATA\\Reader\\1.0.0.0\\Library\\CXML 8th\\Downloads\\Schemas")
+    // packagePrefix = "org.iata.cargoxml.schema"
+    packagePrefix = "com.riege.cargoxml.schema"
+}
+
+task unzipschema(type: Copy) {
+    def thedirectory = new File(schemadir)
+
+    // fileTree(dir: new File(thedirectory), includes: ['**/*.zip']).each { zipFile ->
+    fileTree(dir: thedirectory, includes: ['X*-*.00/*.zip']).each { zipFile ->
+        from zipTree(zipFile)
+    }
+    into thedirectory
+}
+
+xjc {
+    xjcVersion.set("2.3.3")
+    bindingFiles = project.files("$projectDir/src/main/bindings.xjb")
+    groups {
+        //
+        //  The full CargoXML schema are not in this project
+        //  Nevertheless if they are copies into subdirectories under
+        //  src/main/resources/schema, then the following entries could
+        //  be used to register them in order to generate JAXB classed
+        //  from the schema.
+        //  Example path:
+        //    For XFWB3.00, the full schema should be copied so that
+        //    there exists a file
+        //    src/main/resources/schema/CXML-XFWB-3/Waybill_1.xsd
+        //
+        //    Additional the next 4 lines need to be activate to include the
+        //    copies CXML-XWB-3 files:
+        //
+        //    register("xfwb3") {
+        //        xsdFiles = xsdDir.asFileTree.matching { include("**/CXML-XWB-3/**/*.xsd") }
+        //        defaultPackage.set("org.iata.cargoxml.xfwb3")
+        //    }
+
+        //  The official Cargo-XML Toolkit ZIP archives differ in their
+        //  subdirectory structure and naming convensions.
+        //  Take extra care to match the actual unzipped path/file when adding more.
+        register("XFWB3") {
+            xsdFiles = files(new File(schemadir + '/CXML-XFWB-3/Waybill Schema/Waybill_1.xsd').absolutePath)
+            defaultPackage.set("${packagePrefix}.xfwb3")
+        }
+        register("XFSU3") {
+            xsdFiles = files(new File(schemadir + '/XFSU-3.00/StatusMessage_1.xsd').absolutePath)
+            defaultPackage.set("${packagePrefix}.xfsu3")
+        }
+        register("XFZB3") {
+            xsdFiles = files(new File(schemadir + '/CXML-XFZB-3/CXML-XFZB-3/HouseWaybill_1.xsd').absolutePath)
+            defaultPackage.set("${packagePrefix}.xfzb3")
+        }
+        register("XFNM3") {
+            xsdFiles = files(new File(schemadir + '/CXML-XFNM-3/Response/Response_3.xsd').absolutePath)
+            defaultPackage.set("${packagePrefix}.xfnm3")
+        }
+    }
+
+}
+
