@@ -31,9 +31,18 @@ Note that the generated classes contain references to classes from the
 ```javax.xml.bind.annotation``` package. This package is included in Java 8 but no longer in Java 11.
 
 Therefore, when the generated classes are used with JDK 11, it is recommended to
-add a dependecy to the ```jakarta.xml.bind-api```, e.g.
+add a dependency to the ```jakarta.xml.bind-api```, e.g. in gradle with
 
-    jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
+
+or for maven:
+
+    <dependency>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+        <version>2.3.3</version>
+    </dependency>
+
 
 ## How to build from scratch
 
@@ -85,9 +94,14 @@ Windows with Cargo-XML 4th Edition installed:
 
 
 ## Publishing the project
-
 Publishing the generated JAR file from directory ```build/libs``` is required to 
 provide the generated JAXB classes for 3rd partties.
+
+## Publishing to MavenLocal (for developers)
+Project supports pubishing to local, which might be useful to generate a maven
+`pom` file containing the dependency to `jakarta.xml.bind-api`dependency 
+
+    ./gradlew -Pschemadir=$HOME/cargoxml-schema clean publishToMavenLocal
 
 ### Versioning
 
