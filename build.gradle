@@ -1,23 +1,38 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id("com.github.bjornvester.xjc") version "1.6.0"
+    id "com.github.bjornvester.xjc" version "1.6.0"
+    id "com.github.johnrengelman.shadow" version "7.1.0"
 }
 
-dependencies {
-    /*
-     * The following bindings are not required to BUILD or JAR this project
-     * but the generated classes in the jar depend upon them.
-     * (although included in Java 8)
-     * In order to publish properly, the dependencies are declared.
-     */
-    api 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
+/*
+ * Gets the version name from the latest Git tag, omit leading "v" - yeah!
+ * Note: a plugin way to do this would be via https://plugins.gradle.org/plugin/net.nemerosa.versioning
+ */
+def getVersionName = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'describe', '--tags', '--always'
+        standardOutput = stdout
+    }
+    def tag = stdout.toString().trim()
+    return tag.startsWith("v") ? tag.substring(1) : tag
 }
 
-jar {
-    exclude("**/schema/CXML-*/**")
-    exclude("**/schema/X*-*.00/**")
+/*
+ * Gets the commit hash from the latest Git
+ * Note: a plugin way to do this would be via https://plugins.gradle.org/plugin/net.nemerosa.versioning
+ */
+def getGitCommitHash = {
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'log', '-1', '--format="%H"'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim().replace("\"", "")
 }
+
+version = version != null && version != "unspecified" ? version : getVersionName()
 
 ext {
     // for Cargo-XML 8th Edition, the path is
@@ -38,6 +53,22 @@ ext {
     implDescription      = implVendor + ' ' + product + ' JAXB Java Library'
     implVersion          = version
     javaTarget           = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    /*
+     * The following bindings are not required to BUILD or JAR this project
+     * but the generated classes in the jar depend upon them.
+     * (although included in Java 8)
+     * In order to publish properly, the dependencies are declared.
+     */
+    api 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
+    api 'com.sun.xml.bind:jaxb-impl:2.3.5'
+}
+
+jar {
+    exclude("**/schema/CXML-*/**")
+    exclude("**/schema/X*-*.00/**")
 }
 
 task unzipschema(type: Copy) {
@@ -95,11 +126,18 @@ xjc {
     }
 }
 
-group = 'org.iata.cargoxml'
-version = '8.0'
-
+group = 'com.riege'
 sourceCompatibility = javaTarget
 targetCompatibility = javaTarget
+
+shadowJar {
+    // When working with a Gradle project with the name myApp and version 1.0,
+    // the default shadowJar task will output a file at:
+    // build/libs/myApp-1.0-all.jar
+    //
+    // to remove the '-all', we set classifier to null:
+    classifier = null
+}
 
 tasks.withType(Jar) {
     manifest {
@@ -125,8 +163,9 @@ repositories {
 publishing {
     publications {
         thisLibrary(MavenPublication) {
+            publication -> project.shadow.component(publication)
             groupId group
-            from components.java
+            // from components.java
             pom {
                 name = implTitle
                 description = implDescription

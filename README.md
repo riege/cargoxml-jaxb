@@ -30,7 +30,12 @@ This project requires an internet connection to download required additional lib
 Note that the generated classes contain references to classes from the
 ```javax.xml.bind.annotation``` package. This package is included in Java 8 but no longer in Java 11.
 
-Therefore, when the generated classes are used with JDK 11, it is recommended to
+### Version > 8.0
+Versions younger than 8.0 contain the `jakarta.xml.bind-api` bundled within the library jar.
+It is no longer required to declare a dependency when using the library.
+
+### Version 8.0
+When the generated classes are used with JDK 11, it is recommended to
 add a dependency to the ```jakarta.xml.bind-api```, e.g. in gradle with
 
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
@@ -97,24 +102,30 @@ Windows with Cargo-XML 4th Edition installed:
 Publishing the generated JAR file from directory ```build/libs``` is required to 
 provide the generated JAXB classes for 3rd partties.
 
-## Publishing to MavenLocal (for developers)
+### Publishing to MavenLocal (for developers)
 Project supports pubishing to local, which might be useful to generate a maven
-`pom` file containing the dependency to `jakarta.xml.bind-api`dependency 
+`pom` file containing dependencies as required: 
 
     ./gradlew -Pschemadir=$HOME/cargoxml-schema clean publishToMavenLocal
 
 ### Versioning
-
 Recommendation is to use a version pattern for releases which matches the versioning of the
-underlying Cargo-XML Toolkit, e.g.
+underlying Cargo-XML Toolkit in the major release number, e.g. using version `8.0` to 
+release a version which is based upon IATA Cargo-XML Toolkit 8. 
+Minor and Patch releases should follow the [semantic versioning pattern](https://semver.org/)
+with using version tags in git.
 
-    version = '8.0'
+It is possible to overwrite the latest git version tag by providing the version directly to git, e.g.
 
-in build.gradle to release a version which is based upon IATA Cargo-XML Toolkit 8.
+    ./gradlew -Pversion=8.2-SNAPSHOT -Pschemadir=$HOME/cargoxml-schema clean publishToMavenLocal
+
 
 ### Publish on GitHub
 Easiest way of publishing is usage of publishing via [GitHub releases](../../releases)
 on GitHub website and uploading the generated JAR file from directory ```build/libs```.
+
+Publishing is a **manual process** because building the jar requires local access to the schema directory.
+Recommendation is create the version tag in `git` first, then publish on https://github.com/. 
 
 
 ### Publishing on MavenCentral
