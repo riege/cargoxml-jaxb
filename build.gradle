@@ -123,6 +123,10 @@ xjc {
             xsdFiles = files(new File(schemadir + '/CXML-XFNM-3/Response/Response_3.xsd').absolutePath)
             defaultPackage.set("${packagePrefix}.xfnm3")
         }
+//        register("XSDG6") {
+//            xsdFiles = files(new File(schemadir + '/CXML-XSDG-6.00/ShippersDeclarationForDangerousGoods_2p0.xsd').absolutePath)
+//            defaultPackage.set("${packagePrefix}.xsdg6")
+//        }
     }
 }
 
