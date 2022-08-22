@@ -3,4 +3,18 @@
   "extends": [
     "config:base"
   ]
+  "packageRules": [
+    {
+      "matchUpdateTypes": [ "patch" ],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true
+    }
+  ],
+  "separateMinorPatch": true,
+  "separateMultipleMajor": true,
+  "schedule": ["after 9pm and before 6am every weekday", "every weekend"]
 }
