@@ -12,6 +12,10 @@
     {
       "matchDepTypes": ["devDependencies"],
       "automerge": true
+    },
+    {
+      "matchPackagePrefixes": ["com.sun.xml.bind:jaxb-impl"],
+      "enabled": false
     }
   ],
   "separateMinorPatch": true,
