@@ -14,6 +14,10 @@
       "automerge": true
     },
     {
+      "matchPackagePrefixes": ["jakarta.xml.bind:jakarta.xml.bind-api"],
+      "enabled": false
+    },
+    {
       "matchPackagePrefixes": ["com.sun.xml.bind:jaxb-impl"],
       "enabled": false
     }
