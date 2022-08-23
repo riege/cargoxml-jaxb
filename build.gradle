@@ -63,7 +63,7 @@ dependencies {
      * In order to publish properly, the dependencies are declared.
      */
     api 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
-    api 'com.sun.xml.bind:jaxb-impl:2.3.6'
+    api 'com.sun.xml.bind:jaxb-impl:3.0.2'
 }
 
 jar {
