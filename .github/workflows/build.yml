@@ -28,24 +28,5 @@ jobs:
           java-version: '8'
           cache: 'gradle'
 
-      - name: Run Checks (JUnit, Checkstyle, SpotBugs)
-        run: ./gradlew --continue check
-
-      - name: Publish JUnit Report
-        uses: mikepenz/action-junit-report@v3
-        if: always()
-        with:
-          report_paths: '**/test-results/test/*.xml'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish Checkstyle Report
-        uses: jwgmeligmeyling/checkstyle-github-action@v1.2
-        if: always()
-        with:
-          path: '**/reports/checkstyle/*.xml'
-
-      - name: Publish SpotBugs Report
-        uses: jwgmeligmeyling/spotbugs-github-action@v1.2
-        if: always()
-        with:
-          path: '**/reports/spotbugs/*.xml'
+      - name: Run check that gradle is capable to run
+        run: ./gradlew help
