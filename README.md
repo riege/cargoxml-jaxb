@@ -66,12 +66,12 @@ These archives need to get unzipped prior the schema files can be processed.
 This only needs to be be done once and there is already a gradle task `unzipschema` provided for this.
 After checkout / download of this package, one might want to trigger this once from commandline inside download directory via
 
-    gradlew unzipschema
+    ./gradlew unzipschema
 
 For the default directory containing the (unzipped!) CargoXML schema files, the JAR file with the generated
 JAXB classes can be build by executing
 
-    gradlew clean shadowJar
+    ./gradlew clean shadowJar
 
 After successful building, the directory `build/libs` will contain a file `cargoxml-jaxb-$VERSION.jar` which contains only the JAXB classes and is ready to be published.  
 

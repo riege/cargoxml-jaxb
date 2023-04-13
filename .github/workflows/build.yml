@@ -1,0 +1,51 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  GITHUB_PACKAGES_ACCESS_USER: ${{ secrets.GH_PACKAGES_ACCESS_USER }}
+  GITHUB_PACKAGES_ACCESS_TOKEN: ${{ secrets.GH_PACKAGES_ACCESS_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK with Dependency Caching
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+          cache: 'gradle'
+
+      - name: Run Checks (JUnit, Checkstyle, SpotBugs)
+        run: ./gradlew --continue check
+
+      - name: Publish JUnit Report
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: '**/test-results/test/*.xml'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Checkstyle Report
+        uses: jwgmeligmeyling/checkstyle-github-action@v1.2
+        if: always()
+        with:
+          path: '**/reports/checkstyle/*.xml'
+
+      - name: Publish SpotBugs Report
+        uses: jwgmeligmeyling/spotbugs-github-action@v1.2
+        if: always()
+        with:
+          path: '**/reports/spotbugs/*.xml'

@@ -140,7 +140,7 @@ shadowJar {
     // build/libs/myApp-1.0-all.jar
     //
     // to remove the '-all', we set classifier to null:
-    classifier = null
+    archiveClassifier = null
 }
 
 tasks.withType(Jar) {
