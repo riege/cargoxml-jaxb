@@ -62,8 +62,12 @@ dependencies {
      * (although included in Java 8)
      * In order to publish properly, the dependencies are declared.
      */
-    api 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.1'
-    api 'com.sun.xml.bind:jaxb-impl:3.0.2'
+    // NOTE: DO NOT UPGRADE TO
+    //       'jakarta.xml.bind:jakarta.xml.bind-api:3.0.1'
+    //   nor 'com.sun.xml.bind:jaxb-impl:3.0.2'
+    //   since it might break other projects
+    api 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
+    api 'com.sun.xml.bind:jaxb-impl:2.3.3' // oder 2.3.8
 }
 
 jar {
